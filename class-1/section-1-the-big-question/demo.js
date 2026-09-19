@@ -1,60 +1,57 @@
-const model = {
-  "The capital of France is": {
-    Paris: 0.98,
-    London: 0.005,
-    Berlin: 0.005,
-    Rome: 0.005,
-    Madrid: 0.005,
-  },
+// Class 1 — Section 1 demo
+// The code is intentionally tiny. The teaching goal is to visualize:
+// context -> prediction -> append -> predict again.
 
-  "I drink": {
+const distributions = {
+  'I drink': {
     water: 0.45,
     coffee: 0.30,
     tea: 0.15,
     juice: 0.05,
     milk: 0.05,
   },
-
-  "I drink hot": {
-    coffee: 0.55,
-    tea: 0.25,
-    milk: 0.15,
-    water: 0.03,
-    juice: 0.02,
-  },
-
-  "I drink cold": {
-    water: 0.50,
-    juice: 0.25,
-    milk: 0.15,
-    tea: 0.05,
-    coffee: 0.05,
+  'The capital of France is': {
+    Paris: 0.98,
+    London: 0.005,
+    Berlin: 0.005,
+    Rome: 0.005,
+    Madrid: 0.005,
   },
 };
 
 function predictDistribution(prompt) {
-  return model[prompt] ?? {};
+  return distributions[prompt] ?? {};
 }
 
-function predict(prompt) {
-  const distribution = predictDistribution(prompt);
-  const entries = Object.entries(distribution);
+console.log('Distribution for: I drink');
+console.table(predictDistribution('I drink'));
 
-  if (entries.length === 0) {
-    return "I don't know";
+// A deliberately tiny deterministic model for showing
+// how generation works as a loop.
+const brain = {
+  'I love': 'JavaScript',
+  'I love JavaScript': 'because',
+  'I love JavaScript because': 'it',
+  'I love JavaScript because it': 'is',
+  'I love JavaScript because it is': 'fun',
+};
+
+function generate(prompt, maxSteps = 5) {
+  let text = prompt;
+
+  for (let i = 0; i < maxSteps; i++) {
+    const nextToken = brain[text];
+
+    if (!nextToken) break;
+
+    text += ` ${nextToken}`;
   }
 
-  entries.sort((a, b) => b[1] - a[1]);
-  return entries[0][0];
+  return text;
 }
 
-console.log("Distribution for: I drink");
-console.table(predictDistribution("I drink"));
-console.log("Top prediction:", predict("I drink"));
+console.log(generate('I love'));
+// I love JavaScript because it is fun
 
-console.log("\nDistribution for: I drink hot");
-console.table(predictDistribution("I drink hot"));
-console.log("Top prediction:", predict("I drink hot"));
-
-console.log("\nUnknown prompt:");
-console.log(predict("The capital of Germany is"));
+console.log(generate('The capital of Germany is'));
+// The model cannot continue because our toy brain has no rule for that context.
