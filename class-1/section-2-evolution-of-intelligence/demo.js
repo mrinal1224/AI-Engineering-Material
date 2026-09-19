@@ -1,70 +1,62 @@
 // Class 1 — Section 2 demo
-// This file illustrates the difference between hand-written rules
-// and the idea of learning from examples. It does NOT implement ML.
+// This file makes the shift from rules to learned behavior visible.
 
-console.log('=== 1. Rule-based animal classifier ===');
+console.log('=== Rule-based spam filter ===');
 
-function classifyAnimal(animal) {
-  if (animal.hasFur && animal.hasWhiskers && animal.says === 'meow') {
-    return 'cat';
-  }
-  return 'unknown';
+function isSpam(email) {
+  const text = email.toLowerCase();
+
+  if (text.includes('win')) return true;
+  if (text.includes('free')) return true;
+  if (text.includes('click')) return true;
+
+  return false;
 }
 
-const examples = [
-  { name: 'obvious cat', value: { hasFur: true, hasWhiskers: true, says: 'meow' } },
-  { name: 'silent cat', value: { hasFur: true, hasWhiskers: true, says: 'silent' } },
-  { name: 'hairless cat', value: { hasFur: false, hasWhiskers: true, says: 'meow' } },
-  { name: 'tiger', value: { hasFur: true, hasWhiskers: true, says: 'roar' } },
+const messages = [
+  'WIN ₹50,000 NOW!!!',
+  'You have won a reward',
+  'Claim your exclusive offer',
+  'Your invoice is attached',
+  'Click here for your free vacation',
 ];
 
-for (const example of examples) {
-  console.log(example.name, '->', classifyAnimal(example.value));
+for (const message of messages) {
+  console.log(message, '->', isSpam(message));
 }
 
-console.log('\\n=== 2. Brittle keyword rules ===');
+console.log('\\n=== Rule-based support classifier ===');
 
 function classifySupportMessage(message) {
   const text = message.toLowerCase();
 
   if (text.includes('refund')) return 'billing';
   if (text.includes('password')) return 'account';
+
   return 'unknown';
 }
 
-const messages = [
-  'Can I get a refund?',
-  'I want my money back',
-  'Please return my payment',
-  'I forgot my password',
-  'I cannot log in',
-];
+console.log(classifySupportMessage('Can I get a refund?'));
+console.log(classifySupportMessage('I want my money back'));
 
-for (const message of messages) {
-  console.log(message, '->', classifySupportMessage(message));
-}
-
-console.log('\\n=== 3. Training examples ===');
-
-const trainingData = [
-  { text: 'Can I get a refund?', label: 'billing' },
-  { text: 'I want my money back', label: 'billing' },
-  { text: 'Please return my payment', label: 'billing' },
-  { text: 'I forgot my password', label: 'account' },
-  { text: 'I cannot log in', label: 'account' },
-];
-
-console.table(trainingData);
-console.log('Idea: examples -> learning -> model -> prediction');
-
-console.log('\\n=== 4. Parameterized toy classifier ===');
+console.log('\\n=== Parameterized toy model ===');
 
 function classifyBySize(size, threshold) {
   return size < threshold ? 'cat' : 'dog';
 }
 
-console.log('size=3, threshold=10 ->', classifyBySize(3, 10));
-console.log('size=20, threshold=10 ->', classifyBySize(20, 10));
+console.log('size=3 ->', classifyBySize(3, 10));
+console.log('size=20 ->', classifyBySize(20, 10));
 
-console.log('The threshold is still manually chosen.');
-console.log('Later, we will learn how models can learn parameters from data.');
+console.log('\\nThe threshold is manually chosen.');
+console.log('Later, we learn how models can learn parameters from data.');
+
+const trainingData = [
+  { size: 2, animal: 'cat' },
+  { size: 3, animal: 'cat' },
+  { size: 18, animal: 'dog' },
+  { size: 20, animal: 'dog' },
+];
+
+console.table(trainingData);
+console.log('Training intuition: examples -> learning -> model -> prediction');
