@@ -1,136 +1,197 @@
 # Class 1 — Section 1: The Big Question
 
-## Theme
-What is an LLM actually doing when it generates text?
+## Goal
 
-## Duration
+This section is a **discovery exercise**, not a definition dump.
+
+The student should discover:
+
+> **An LLM takes context, predicts the next token, appends it, and repeats.**
+
+## Runtime
+
 15–20 minutes
 
-## Primary Learning Outcome
-By the end of this section, learners should be able to explain:
-"An LLM is a model trained to predict the next token from the context it has seen so far."
+## Story Arc
 
-This is intentionally a first mental model. Later sections unpack token, context, prediction, and model.
+**Mystery -> Prediction -> Probability -> Context -> Generation Loop -> Reveal**
 
-## Instructor Intent
-Do not begin with a formal definition. Create a sequence of questions:
-1. Can a machine generate language?
-2. How does a machine decide what to say next?
-3. Is there always one correct next word?
-4. Does context change the prediction?
-5. Could text generation be viewed as repeated prediction?
-6. What would a model need to learn in order to do this well?
+---
 
-The definition of an LLM should feel like the answer to questions students have discovered.
+## 1. Cold Open
 
-## Opening Hook
+### Instructor says
+
+> "I am going to show you something that looks obvious, but it hides the core idea behind ChatGPT."
+
 Write:
-"Can a machine write?"
 
-Pause, then:
-"Can a machine understand language?"
+```text
+I love
+```
 
-Pause, then:
-"What do you think ChatGPT is actually doing when we type a sentence?"
+Ask one student:
 
-Take a few answers before explaining anything.
+> "Finish this sentence."
 
-### Instructor note
-Avoid early claims such as:
-- ChatGPT understands exactly like humans.
-- ChatGPT thinks like a human.
-- LLMs know the correct answer.
+Take several answers.
 
-At this stage, separate observable behavior from assumptions about human-like understanding.
+Likely answers:
+- JavaScript
+- coding
+- pizza
+- you
 
-## Prediction Game — Round 1
-Tell the class:
-"For the next few minutes, you are the language model."
+Do not correct anyone.
 
-Show:
-The capital of France is ______
+Then ask:
 
-Ask everyone to shout the next word.
+> "Why did different people produce different answers from the same two words?"
 
-Expected: Paris.
+Let the class discuss.
 
-Ask:
-"Why did almost everyone choose Paris?"
+### Reveal
 
-Then:
-"Did the sentence itself contain the word Paris?"
+Write:
 
-Answer: No.
-
-Explain:
-"You used the words before the blank to predict what comes next. What you already saw influenced what you predicted."
-
-Board:
-Previous text -> prediction
-
-Introduce context informally; do not deep-dive into context windows yet.
-
-## Prediction Game — Round 2: Multiple Valid Answers
-Show:
-I drink ______
-
-Collect predictions:
-water, coffee, tea, milk, juice.
-
-Ask:
-"Who is wrong?"
-
-Important teaching moment:
-There does not have to be one universally correct next word.
-
-Explain:
-Language is probabilistic. Given some context, several next tokens can be plausible, but some are more likely than others.
-
-Board:
-"I drink"
-water -> likely
-coffee -> likely
-tea -> plausible
-chair -> unlikely
-
-The point is not that a model has a tiny fixed list. The point is that language naturally creates a distribution of plausible continuations.
-
-## Prediction Game — Round 3: Context Changes the Prediction
-Example A:
-I drink hot ______
-Likely: coffee, tea, milk
-
-Example B:
-I drink cold ______
-Likely: water, juice, milk
-
-Ask:
-"What changed?"
-
-Answer:
-Context.
-
-Board:
-More context
-  -> Different probability distribution
-  -> Different next-token prediction
-
-## Is an LLM Just Autocomplete?
-Students may say:
-"So an LLM is just autocomplete?"
+```text
+context -> prediction
+```
 
 Say:
-"That is actually a useful starting point."
 
-Explain:
-Autocomplete is a good intuition, but real LLMs use learned neural representations, large parameter sets, sophisticated architectures, and long contexts to model much richer distributions.
+> "That tiny relationship is going to explain a huge part of what an LLM does."
 
-Key statement:
-Next-token prediction is the core objective.
+---
 
-## Live Mini Demo — Smallest Language Model
-Run:
+## 2. Prediction Game — You Are the LLM
 
+Tell the class:
+
+> "For the next five minutes, you are the language model. I give you context. You give me the next token."
+
+### Round A — Predictable
+
+```text
+The capital of France is
+```
+
+Expected:
+
+```text
+Paris
+```
+
+Ask:
+
+> "Was Paris written anywhere in the prompt?"
+
+No.
+
+Then:
+
+> "So you used the context to make a prediction."
+
+---
+
+### Round B — Multiple plausible answers
+
+```text
+I drink
+```
+
+Collect 5–6 answers.
+
+Possible:
+
+```text
+water
+coffee
+tea
+milk
+juice
+```
+
+Ask:
+
+> "Who is wrong?"
+
+Important reveal:
+
+> "There doesn't have to be one universally correct next word. Language gives us a distribution of plausible continuations."
+
+Illustrative board:
+
+```text
+I drink
+
+water   ██████████
+coffee  ███████
+tea     ████
+juice   ██
+chair   ▏
+```
+
+Tell students:
+
+> "These bars are only a visual analogy. These are not real LLM probabilities."
+
+---
+
+### Round C — Context changes the prediction
+
+Show:
+
+```text
+I drink hot
+I drink cold
+I drink during
+I drink after
+```
+
+Ask:
+
+> "Should the same next word win in every case?"
+
+Then write:
+
+```text
+More context
+     ↓
+Different distribution
+     ↓
+Different prediction
+```
+
+This is the first major idea of the class.
+
+---
+
+## 3. Real-Life Analogy — Phone Keyboard
+
+Ask:
+
+> "Why does your phone suggest something different after 'see you' versus 'see you at'?"
+
+Expected:
+
+> "The context changed."
+
+Then explain:
+
+> "LLMs use the same broad intuition of context-dependent prediction, but with a much more capable learned neural network and a vastly larger vocabulary."
+
+Important:
+
+> "This is an analogy for the prediction idea, not a claim that phone autocomplete and an LLM have the same internal architecture."
+
+---
+
+## 4. Live Demo — The Smallest Possible Language Model
+
+Type this manually in VS Code:
+
+```js
 const brain = {
   "The capital of France is": "Paris",
   "I drink hot": "coffee",
@@ -143,30 +204,46 @@ function predict(prompt) {
 }
 
 console.log(predict("The capital of France is"));
-// Paris
-
 console.log(predict("I drink hot"));
-// coffee
+```
 
-Then:
+Explain every line:
+
+- `brain` is our fake model.
+- The key is the context.
+- The value is the predicted continuation.
+- `predict()` maps context to an answer.
+- This is **not** a real LLM; it is a teaching model.
+
+Now break it:
+
+```js
 console.log(predict("The capital of Germany is"));
 // I don't know
+```
 
 Ask:
-"Why did our model fail?"
+
+> "Why did it fail?"
 
 Expected:
-"Because we never gave it that rule."
+
+> "Because we manually programmed only a few cases."
 
 Bridge:
-"How do real models learn these patterns instead of us manually writing rules?"
 
-Do not solve that question yet.
+> "Then the obvious question is: how do real models learn these patterns instead of us manually writing every rule?"
 
-## Better Demo — From One Answer to a Distribution
-Use:
+Do not answer yet.
 
-const model = {
+---
+
+## 5. Demo — One Answer Is Not Enough
+
+Show a distribution:
+
+```js
+const distributions = {
   "I drink": {
     water: 0.45,
     coffee: 0.30,
@@ -174,6 +251,7 @@ const model = {
     juice: 0.05,
     milk: 0.05,
   },
+
   "The capital of France is": {
     Paris: 0.98,
     London: 0.005,
@@ -183,159 +261,252 @@ const model = {
   },
 };
 
-function predictDistribution(prompt) {
-  return model[prompt] ?? {};
+console.table(distributions["I drink"]);
+```
+
+Say:
+
+> "These numbers are made up by us for the demo. A real LLM computes a distribution from learned parameters."
+
+Ask:
+
+> "Would a real model only score five possible tokens?"
+
+No.
+
+Explain:
+
+> "A real model scores a large vocabulary of candidate next tokens."
+
+Core mental model:
+
+```text
+Context
+  ↓
+scores / probabilities
+  ↓
+candidate next tokens
+  ↓
+choose or sample a token
+```
+
+---
+
+## 6. The Big Reveal — Generation Is a Loop
+
+Now run the most important demo.
+
+```js
+const brain = {
+  "I love": "JavaScript",
+  "I love JavaScript": "because",
+  "I love JavaScript because": "it",
+  "I love JavaScript because it": "is",
+  "I love JavaScript because it is": "fun",
+};
+
+function generate(prompt, maxSteps = 5) {
+  let text = prompt;
+
+  for (let i = 0; i < maxSteps; i++) {
+    const nextToken = brain[text];
+
+    if (!nextToken) break;
+
+    text += ` ${nextToken}`;
+  }
+
+  return text;
 }
 
-console.log(predictDistribution("I drink"));
+console.log(generate("I love"));
+```
 
-Explain:
-water -> 45%
-coffee -> 30%
-tea -> 15%
-juice -> 5%
-milk -> 5%
+Output:
+
+```text
+I love JavaScript because it is fun
+```
+
+Pause.
 
 Ask:
-"Would a real language model only have five possible options?"
 
-No. A real model scores a very large vocabulary.
+> "What just happened?"
 
-Core idea:
-Context
-  -> scores/probabilities for possible next tokens
-  -> choose or sample a next token
+Walk through the loop:
 
-## Core Mental Model
+```text
+I love
+   ↓
+I love JavaScript
+   ↓
+I love JavaScript because
+   ↓
+I love JavaScript because it
+   ↓
+I love JavaScript because it is
+   ↓
+I love JavaScript because it is fun
+```
+
+### Unforgettable sentence
+
+> **The model predicts one token, appends it to the context, and predicts again.**
+
+That sentence becomes the foundation for the rest of the LLM phase.
+
+---
+
+## 7. What We Still Do Not Know
+
+Tell students:
+
+> "We now know what the model is trying to do. We have not yet learned how it does it."
+
 Write:
 
-CONTEXT
-   |
-   v
-+--------------+
-|   LLM MODEL  |
-+--------------+
-   |
-   v
-probabilities over
-possible next tokens
-   |
-   v
-next token
-   |
-   v
-append to text
-   |
-   v
-predict again...
+```text
+1. What exactly is a token?
+2. How does text become numbers?
+3. Where do the probabilities come from?
+4. How does the model learn its parameters?
+5. Why can it use so much context?
+```
 
-Explain:
-If the user types:
-"The capital of France"
+Say:
 
-the model predicts a next token such as:
-Paris
+> "These are the questions we are going to answer over the next few classes."
 
-The generated token becomes part of the context used for the next prediction.
+Do **not** jump into embeddings or attention yet.
 
-Be precise: use token, not simply word.
+---
 
-## First Precise Definition
-Large Language Model:
-"A Large Language Model (LLM) is a neural network trained on large amounts of text to model language by predicting the probability of the next token given the previous context."
+## 8. First Precise Definition
+
+Only now introduce the formal definition:
+
+> **An LLM is a large neural network trained to model language by predicting the probability of the next token given the previous context.**
 
 Break it down:
-Large = large number of learned parameters and training data.
-Language = models sequences of language tokens.
-Model = a parameterized mathematical function that maps input to predictions.
 
-This is a first-principles teaching definition, not a complete specification of every modern LLM or post-training technique.
+### Large
 
-## Does It Understand?
+A large number of learned parameters and substantial training data.
+
+### Language model
+
+A model that learns statistical structure in sequences of language tokens.
+
+### Predict
+
+It outputs scores/probabilities for candidate next tokens.
+
+### Context
+
+The preceding tokens available to condition the next prediction.
+
+---
+
+## 9. Thought Experiment — Does It Need Human-Like Understanding?
+
 Ask:
-"So does ChatGPT understand English?"
 
-Do not force a philosophical yes/no.
+> "Does the computer need a little person inside it to decide the next word?"
 
-Use:
-"From an engineering perspective, we can explain a huge amount of its behavior without assuming human-like understanding. Our first useful abstraction is that it models patterns in token sequences and uses those learned patterns to predict what comes next."
+Let students respond.
 
-## Retrieval Questions
-Q1: What does an LLM predict?
-Expected: The next token, conditioned on previous context.
+Then say:
 
-Q2: Why can multiple next tokens be valid?
-Expected: Because language is probabilistic; several continuations can be plausible.
+> "For our engineering mental model, no. We can explain the core generation loop through learned probabilistic prediction over token sequences without assuming human-like understanding."
 
-Q3: Why does adding context change the prediction?
-Expected: Because the probability distribution over next tokens depends on the preceding context.
+This keeps the lecture mechanism-first.
 
-Q4: Is next-token prediction the whole implementation of an LLM?
-Expected: No. It is the core training/generation abstraction; the actual model uses a much more complex neural architecture.
+---
 
-## Common Misconceptions
-"LLM predicts the next word."
-Correction: "Conceptually yes, but technically we should say next token."
+## 10. Retrieval Questions
 
-"The model stores every sentence it has seen."
-Clarify: "A trained model primarily stores learned parameters, not a simple searchable copy of its entire training dataset."
+Ask without notes.
 
-"The model always picks the most probable token."
-Clarify: "Not necessarily. Generation can involve sampling; we will study temperature, top-k, and top-p later."
+### Q1
 
-"The model knows the answer and then writes it."
-Clarify: "Our first mental model is sequential generation: predict the next token, append it, then predict again."
+**What does an LLM predict?**
 
-"LLM = ChatGPT."
-Clarify: "ChatGPT is a product/interface. An LLM is the underlying model technology."
+Expected:
 
-## Optional 60-Second Challenge
-Prompt:
-The programmer opened the
+> The next token given the preceding context.
 
-Collect predictions: terminal, computer, editor, laptop, code.
+### Q2
 
-Then:
-The programmer opened the terminal and ran
+**Why can several next tokens be plausible?**
 
-Ask again.
+Expected:
 
-Takeaway:
-More context can constrain the next-token distribution.
+> Language is probabilistic; multiple continuations can have non-zero probability.
 
-## Bridge to Section 2
+### Q3
+
+**Why does context matter?**
+
+Expected:
+
+> Changing the context changes the conditional distribution over possible next tokens.
+
+### Q4
+
+**Does the model generate an entire answer in one conceptual step?**
+
+Expected:
+
+> Our generation abstraction is sequential: predict -> append -> predict again.
+
+---
+
+## 11. End-of-Section Challenge
+
+Put this on screen:
+
+```text
+The engineer opened the
+```
+
+Everyone writes one continuation.
+
+Then change it to:
+
+```text
+The engineer opened the terminal and ran
+```
+
+Ask:
+
+> "Why did your prediction change?"
+
+Expected insight:
+
+> More context changes the next-token distribution.
+
+---
+
+## 12. Bridge to Section 2
+
 End with:
-"So far, we have one big idea: an LLM predicts the next token."
 
-Then ask:
-"But exactly what is a token?"
-"How does a computer represent that token?"
-"How can a neural network turn a huge vocabulary into probabilities?"
+> "We now know **what an LLM does**."
 
-Those questions lead into the rest of Class 1.
+Pause.
 
-## Instructor Checklist
-- Language generation can be viewed as prediction.
-- Context affects prediction.
-- Multiple next tokens can be plausible.
-- The model produces a distribution over possible next tokens.
-- Generation happens sequentially.
-- We say token, not simply word.
-- Next-token prediction is the core abstraction, not the full implementation.
-- An LLM is learned, not a manually written rule table.
+> "But we have not answered **how we got from normal software written with explicit rules to a model that can learn patterns in language at this scale**."
 
-## Suggested Timing
-Hook + discussion: 2 min
-Prediction Game Round 1: 2 min
-Prediction Game Round 2: 3 min
-Context experiment: 2 min
-Autocomplete discussion: 2 min
-JS toy model: 3 min
-Definition + recap: 3 min
+That is Section 2.
 
-Total: ~17 min
+---
 
-## Build Artifact
-class-1/section-1-the-big-question/
-  README.md
-  demo.js
+## Instructor Rules for This Section
+
+- Ask before explaining.
+- Let students give wrong answers.
+- Use code to reveal the concept rather than decorating the explanation.
+- Never call the toy lookup table a real LLM.
+- Use **token**, not only **word**.
+- Separate the idea of prediction from the later mechanics of embeddings, attention, and training.
